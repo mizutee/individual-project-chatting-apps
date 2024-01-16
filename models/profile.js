@@ -10,18 +10,34 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // define association here
+      Profile.belongsTo(models.User, {references: "UserId"})
     }
   }
-  Profile.init({
-    username: DataTypes.STRING,
-    gender: DataTypes.STRING,
-    age: DataTypes.INTEGER,
-    imgUrl: DataTypes.STRING,
-    UserId: DataTypes.INTEGER
-  }, {
-    sequelize,
-    modelName: 'Profile',
-  });
+  Profile.init(
+    {
+      username: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      gender: DataTypes.STRING,
+      age: DataTypes.INTEGER,
+      imgUrl: {
+        type: DataTypes.STRING,
+        defaultValue:
+          "https://pbs.twimg.com/profile_images/1228666363939606529/cFZCx2CB_400x400.jpg",
+      },
+      UserId: {
+        type: DataTypes.INTEGER,
+        references: {
+          model: "User",
+          key: "id"
+        }
+      },
+    },
+    {
+      sequelize,
+      modelName: "Profile",
+    }
+  );
   return Profile;
 };

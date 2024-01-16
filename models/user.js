@@ -10,16 +10,57 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // define association here
+      User.hasOne(models.Profile, {references: "UserId"})
     }
   }
-  User.init({
-    email: DataTypes.STRING,
-    password: DataTypes.STRING,
-    fullName: DataTypes.STRING
-  }, {
-    sequelize,
-    modelName: 'User',
-  });
+  User.init(
+    {
+      email: {
+        type: DataTypes.STRING,
+        unique: true,
+        allowNull: false,
+        validate: {
+          notEmpty: {
+            msg: "E-mail cannot be empty",
+          },
+          notNull: {
+            msg: "E-mail cannot be empty",
+          },
+        },
+      },
+      password: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        validate: {
+          notEmpty: {
+            msg: "Password cannot be empty",
+          },
+          notNull: {
+            msg: "Password cannot be empty",
+          },
+          min: {
+            args: [8],
+            msg: "Must have at least 8 characters",
+          },
+        },
+      },
+      fullName: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        validate: {
+          notEmpty: {
+            msg: "Full Name cannot be empty"
+          },
+          notNull: {
+            msg: "Full Name cannot be empty"
+          }
+        }
+      },
+    },
+    {
+      sequelize,
+      modelName: "User",
+    }
+  );
   return User;
 };
