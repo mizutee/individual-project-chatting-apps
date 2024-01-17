@@ -122,7 +122,9 @@ app.get("/profile", authentication, async (req, res) => {
       },
     });
     res.status(201).json(user);
-  } catch (error) {}
+  } catch (error) {
+    console.log(error);
+  }
 });
 
 app.listen(port, () => {
