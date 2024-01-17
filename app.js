@@ -114,7 +114,16 @@ app.post("/login", async (req, res) => {
   }
 });
 
-app.get("/", authentication, (req, res) => {});
+app.get("/profile", authentication, async (req, res) => {
+  try {
+    let user = User.findOne({
+      where: {
+        id: req.user.id,
+      },
+    });
+    res.status(201).json(user);
+  } catch (error) {}
+});
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
