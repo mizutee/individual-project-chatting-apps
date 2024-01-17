@@ -1,4 +1,6 @@
 'use strict';
+const bcrypt = require('bcrypt');
+
 const {
   Model
 } = require('sequelize');
@@ -17,8 +19,10 @@ module.exports = (sequelize, DataTypes) => {
     {
       email: {
         type: DataTypes.STRING,
-        unique: true,
         allowNull: false,
+        unique: {
+          msg: "E-mail already registered"
+        },
         validate: {
           notEmpty: {
             msg: "E-mail cannot be empty",
@@ -62,5 +66,8 @@ module.exports = (sequelize, DataTypes) => {
       modelName: "User",
     }
   );
+  User.beforeCreate((user, options) => {
+    return user.password = bcrypt.hashSync(user.password, bcrypt.genSaltSync(8));
+  })
   return User;
 };
