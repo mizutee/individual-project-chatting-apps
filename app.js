@@ -4,6 +4,9 @@ const port = 3000;
 const { User } = require("./models");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const cors = require("cors");
+
+app.use(cors());
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
@@ -14,46 +17,78 @@ app.get("/", (req, res) => {
 
 const authentication = async (req, res, next) => {
   try {
-    const {authorization} = req.headers;
+    const { authorization } = req.headers;
 
-    if(!authorization) throw {name: "NoAuthorization"}
+    if (!authorization) throw { name: "NoAuthorization" };
 
     let [type, token] = authorization.split(" ");
 
-    if(!type || type !== "Bearer") throw {name: "NoAuthorization"}
+    if (!type || type !== "Bearer") throw { name: "NoAuthorization" };
 
     let verify = jwt.decode(token, "rahasia");
 
-    if(!verify) throw {name: "NoAuthorization"}
+    if (!verify) throw { name: "NoAuthorization" };
 
     req.user = verify;
 
-    next()
-  } catch (error) {
-    console.log(error)
-  }
-}
-
-app.post("/register", async (req, res) => {
-  try {
-    let {email, password, fullName} = req.body;
-
-    // console.log(password, email, fullName);
-
-    await User.create(req.body);
-
-    let user = await User.findOne({where: {email: email}, attributes: {exclude: "password, createdAt, updatedAt"}})
-
-    res.status(201).json(user)
-
+    next();
   } catch (error) {
     console.log(error);
   }
-})
+};
+
+app.post("/register", async (req, res) => {
+  try {
+    let { email, password, fullName } = req.body;
+
+    await User.create(req.body);
+
+    let user = await User.findOne({
+      where: { email: email },
+      attributes: { exclude: "password, createdAt, updatedAt" },
+    });
+
+    res.status(201).json(user);
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+app.post("/google-sign-in", async (req, res) => {
+  try {
+    let { email, displayName } = req.body;
+
+    const [user, created] = await User.findOrCreate({
+      where: {
+        email: email,
+      },
+      defaults: {
+        email: email,
+        password: Math.random() * 8777,
+        fullName: displayName,
+      },
+      hooks: false,
+    });
+
+    let newUser = await User.findOne({
+      where: {
+        email: email,
+      },
+    });
+
+    let token = jwt.sign(
+      { id: newUser.id, email: newUser.email, fullName: newUser.fullname },
+      "rahasia"
+    );
+
+    res.status(201).json({ access_token: token });
+  } catch (error) {
+    console.log(error);
+  }
+});
 
 app.post("/login", async (req, res) => {
   try {
-
     let { email, password } = req.body;
 
     let user = await User.findOne({
@@ -73,18 +108,13 @@ app.post("/login", async (req, res) => {
       "rahasia"
     );
 
-    req.user = token;
-
-    res.status(201).json({access_token: token});
-
+    res.status(201).json({ access_token: token });
   } catch (error) {
     console.log(error);
   }
 });
 
-app.get('/', authentication, (req, res) => {
-  
-})
+app.get("/", authentication, (req, res) => {});
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
