@@ -82,8 +82,8 @@ app.post("/login", async (req, res) => {
   }
 });
 
-app.get('/testing', authentication, (req, res) => {
-  console.log(req.user)
+app.get('/', authentication, (req, res) => {
+  
 })
 
 app.listen(port, () => {
