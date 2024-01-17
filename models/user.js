@@ -30,7 +30,7 @@ module.exports = (sequelize, DataTypes) => {
       },
       password: {
         type: DataTypes.STRING,
-        allowNull: true,
+        allowNull: false,
         validate: {
           notEmpty: {
             msg: "Password cannot be empty",
@@ -46,7 +46,7 @@ module.exports = (sequelize, DataTypes) => {
       },
       fullName: {
         type: DataTypes.STRING,
-        allowNull: true,
+        allowNull: false,
         validate: {
           notEmpty: {
             msg: "Full Name cannot be empty"
