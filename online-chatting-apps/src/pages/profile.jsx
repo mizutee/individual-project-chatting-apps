@@ -6,6 +6,15 @@ import { Link } from "react-router-dom";
 export default function Profile() {
 
     const [profile, setProfile] = useState()
+    const [editProfile, setEditProfile] = useState()
+    const [form, setForm] = useState({
+        fullName: "",
+        email: "",
+        username: "",
+        gender: "",
+        age: 0,
+    })
+    const [file, setFile] = useState(null)
 
     async function fetchProfile() {
         try {
@@ -18,6 +27,16 @@ export default function Profile() {
             })
 
             setProfile(data);
+            setEditProfile(data.Profile)
+            setForm({
+                ...form,
+                fullName: data.fullName,
+                email: data.email,
+                username: data.Profile.username,
+                gender: data.Profile.gender,
+                age: data.Profile.age,
+                imgUrl: data.Profile.imgUrl
+            })
 
         } catch (error) {
 
@@ -26,9 +45,59 @@ export default function Profile() {
         }
     }
 
+    const onChangeHandler = async (event) => {
+        try {
+            // console.log(event);
+            let {name, value} = event.target
+            setForm({...form, [name]: value})
+        } catch (error) {
+            
+        }
+    }
+
+    const onChangeFile = (event) => {
+        // console.log(event.target.files[0]);
+        setFile(event.target.files[0])
+    }
+
+    const submitHandler = async (event) => {
+        try {
+
+            event.preventDefault();
+
+            let responseForm = await axios({
+                url: 'http://localhost:3000/profile/' + editProfile.id,
+                method: "put",
+                data: form,
+                headers: {
+                    Authorization: localStorage.getItem("access_token")
+                }
+            })
+
+            console.log(responseForm);
+
+            if(file) {
+                let formData = new FormData()
+                formData.append('imgUrl', file)
+                await axios({
+                    url: 'http://localhost:3000/profile/' + editProfile.id,
+                    method: "patch",
+                    data: formData,
+                    headers: {
+                        Authorization: localStorage.getItem("access_token")
+                    }
+                })
+            }
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
     useEffect(() => {
         fetchProfile()
     }, [])
+
+    console.log(form);
 
   return (
     <>
@@ -89,7 +158,7 @@ export default function Profile() {
           </div>
           <div className="flex flex-col flex-auto h-full p-6">
             <div className="flex flex-col flex-auto flex-shrink-0 rounded-2xl bg-gray-100 h-full p-4 items-center justify-center">
-              <form className="w-3/5">
+              <form className="w-3/5" onSubmit={submitHandler}>
                 <label className="form-control w-full">
                   <div className="label">
                     <span className="label-text">Full Name</span>
@@ -99,6 +168,7 @@ export default function Profile() {
                     placeholder={profile && profile.fullName}
                     className="input input-bordered w-full "
                     disabled
+                    value={form.fullName}
                   />
                 </label>
                 <label className="form-control w-full ">
@@ -118,8 +188,12 @@ export default function Profile() {
                   </div>
                   <input
                     type="text"
-                    placeholder=""
+                    name="username"
+                    placeholder={editProfile && editProfile.username}
                     className="input input-bordered w-full "
+                    disabled={editProfile && editProfile.username ? true : false}
+                    onChange={onChangeHandler}
+                    value={form.username}
                   />
                 </label>
                 <label className="form-control w-full ">
@@ -127,9 +201,13 @@ export default function Profile() {
                     <span className="label-text">Gender</span>
                   </div>
                   <input
+                  name="gender"
                     type="text"
-                    placeholder=""
+                    placeholder={editProfile && editProfile.gender}
                     className="input input-bordered w-full "
+                    disabled={editProfile && editProfile.gender ? true : false}
+                    onChange={onChangeHandler}
+                    value={form.gender}
                   />
                 </label>
                 <label className="form-control w-full ">
@@ -137,9 +215,13 @@ export default function Profile() {
                     <span className="label-text">Age</span>
                   </div>
                   <input
-                    type="text"
-                    placeholder=""
+                  name="age"
+                    type="number"
+                    placeholder={editProfile && editProfile.age}
                     className="input input-bordered w-full "
+                    value={editProfile && editProfile.age ? null : null}
+                    onChange={onChangeHandler}
+                    disabled={editProfile && editProfile.age > 0 ? true : false}
                   />
                 </label>
                 <label className="form-control w-full ">
@@ -147,8 +229,10 @@ export default function Profile() {
                     <span className="label-text">Pick a file</span>
                   </div>
                   <input
+                  name="imgUrl"
                     type="file"
                     className="file-input file-input-bordered w-full "
+                    onChange={onChangeFile}
                   />
                 </label>
                 <div >

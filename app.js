@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
 const port = 3000;
-const { User } = require("./models");
+const { User, Profile } = require("./models");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const cors = require("cors");
@@ -48,6 +48,10 @@ app.post("/register", async (req, res) => {
       attributes: { exclude: "password, createdAt, updatedAt" },
     });
 
+    await Profile.create({
+      UserId: user.id
+    })
+    
     res.status(201).json(user);
   } catch (error) {
     console.log(error);
@@ -75,6 +79,18 @@ app.post("/google-sign-in", async (req, res) => {
         email: email,
       },
     });
+
+    let validateProfile = await Profile.findOne({
+      where: {
+        UserId: newUser.id
+      }
+    })
+
+    if(!validateProfile) {
+      await Profile.create({
+        UserId: newUser.id
+      })
+    }
 
     let token = jwt.sign(
       { id: newUser.id, email: newUser.email, fullName: newUser.fullname },
@@ -117,16 +133,39 @@ app.post("/login", async (req, res) => {
 app.get("/profile", authentication, async (req, res) => {
   try {
     let user = await User.findOne({
+      include: {
+        model: Profile
+      },
       where: {
         id: req.user.id,
       },
-      attributes: {exclude: "password"}
+      attributes: {exclude: "password"},
     });
     res.status(201).json(user);
   } catch (error) {
     console.log(error);
   }
 });
+
+app.put("/profile/:id", authentication, async (req, res) => {
+  try {
+    const {id} = req.params;
+
+    let verifyData = await Profile.findByPk(id);
+
+    console.log(verifyData);
+
+    await Profile.update(req.body, {
+      where: {
+        id: id
+      }
+    })
+
+    res.status(201).json({message: "Profile has been updated successfully"})
+  } catch (error) {
+    
+  }
+})
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
