@@ -24,6 +24,8 @@ export default function LoginPage() {
         data: result.user,
       });
 
+      console.log(data);
+
       localStorage.access_token = "Bearer " + data.access_token;
 
       navigate('/')
@@ -48,8 +50,12 @@ export default function LoginPage() {
             method: "post",
             data: loginData
         })
+        
+        console.log(data.profile);
 
         localStorage.setItem("access_token", "Bearer " + data.access_token);
+        localStorage.setItem("email", data.profile.email);
+        localStorage.setItem("fullName", data.profile.fullName)
 
         navigate('/')
         
