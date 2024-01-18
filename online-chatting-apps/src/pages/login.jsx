@@ -5,7 +5,7 @@ import {
 } from "firebase/auth";
 import { auth, app } from "../firebase";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 
 export default function LoginPage() {
@@ -188,9 +188,7 @@ export default function LoginPage() {
             </form>
           </div>
           <div className="flex justify-center items-center mt-6">
-            <a
-              href="#"
-              target="_blank"
+            <Link to="/register"
               className="inline-flex items-center font-bold text-blue-500 hover:text-blue-700 text-xs text-center"
             >
               <span>
@@ -207,7 +205,7 @@ export default function LoginPage() {
                 </svg>
               </span>
               <span className="ml-2">You don't have an account?</span>
-            </a>
+            </Link>
           </div>
         </div>
       </div>

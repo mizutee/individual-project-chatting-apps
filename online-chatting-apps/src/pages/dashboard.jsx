@@ -137,7 +137,11 @@ export default function ChatRoom() {
               <div className="ml-2 font-bold text-2xl">QuickChat</div>
             </div>
             <div className="flex flex-col items-center bg-indigo-100 border border-gray-200 mt-4 w-full py-6 px-4 rounded-lg">
-              <IoSettings />
+              <div className="flex w-full place-content-end">
+                <button>
+                  <IoSettings className="size-6" />
+                </button>
+              </div>
               <div className="h-20 w-20 rounded-full border overflow-hidden">
                 <img
                   src="https://pbs.twimg.com/profile_images/1228666363939606529/cFZCx2CB_400x400.jpg"
