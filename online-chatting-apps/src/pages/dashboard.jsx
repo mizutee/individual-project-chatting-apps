@@ -30,6 +30,21 @@ export default function ChatRoom() {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [newHeight, setNewHeight] = useState(0);
+  const [profile, setProfile] = useState({})
+
+  async function fetchProfile() {
+    try {
+      let { data } = await axios({
+        url: "http://localhost:3000/profile",
+        method: "get",
+        headers: {
+          Authorization: localStorage.getItem("access_token"),
+        },
+      });
+    //   console.log(data);
+    setProfile(data.Profile)
+    } catch (error) {}
+  }
 
   useEffect(() => {
     const q = query(collection(db, "messages"), orderBy("timestamp"));
@@ -60,6 +75,7 @@ export default function ChatRoom() {
         });
       }
     });
+    fetchProfile();
   }, []);
 
   useEffect(() => {
@@ -79,13 +95,15 @@ export default function ChatRoom() {
     await addDoc(collection(db, "messages"), {
       email: user.email,
       imgUrl:
-        "https://pbs.twimg.com/profile_images/1228666363939606529/cFZCx2CB_400x400.jpg",
+        profile.imgUrl,
       nickname: user.displayName,
       text: newMessage,
       timestamp: serverTimestamp(),
     });
     setNewMessage("");
   };
+
+  console.log(profile);
 
   return (
     // <div>
@@ -144,7 +162,7 @@ export default function ChatRoom() {
               </div>
               <div className="h-20 w-20 rounded-full border overflow-hidden">
                 <img
-                  src="https://pbs.twimg.com/profile_images/1228666363939606529/cFZCx2CB_400x400.jpg"
+                    src={profile && profile.imgUrl}
                   alt="Avatar"
                   className="h-full w-full"
                 />
@@ -152,7 +170,7 @@ export default function ChatRoom() {
               <div className="text-sm font-semibold mt-2">
                 {user && user.displayName}
               </div>
-              <div className="text-xs text-gray-500">Lead UI/UX Designer</div>
+              {/* <div className="text-xs text-gray-500">Lead UI/UX Designer</div> */}
               <div className="flex flex-row items-center mt-3">
                 <button
                   className="middle none center rounded-lg bg-red-500 py-3 px-6 font-sans text-xs font-bold uppercase text-white shadow-md shadow-red-500/20 transition-all hover:shadow-lg hover:shadow-red-500/40 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"

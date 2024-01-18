@@ -1,9 +1,12 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { IoSettings } from "react-icons/io5";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { AiOutlineUserDelete } from "react-icons/ai";
 
 export default function Profile() {
+
+    const navigate = useNavigate()
 
     const [profile, setProfile] = useState()
     const [editProfile, setEditProfile] = useState()
@@ -65,6 +68,8 @@ export default function Profile() {
 
             event.preventDefault();
 
+            console.log(form, `==form==`)
+
             let responseForm = await axios({
                 url: 'http://localhost:3000/profile/' + editProfile.id,
                 method: "put",
@@ -74,12 +79,12 @@ export default function Profile() {
                 }
             })
 
-            console.log(responseForm);
 
             if(file) {
+                console.log('masuk ke file')
                 let formData = new FormData()
                 formData.append('imgUrl', file)
-                await axios({
+                let responseFile = await axios({
                     url: 'http://localhost:3000/profile/' + editProfile.id,
                     method: "patch",
                     data: formData,
@@ -87,7 +92,30 @@ export default function Profile() {
                         Authorization: localStorage.getItem("access_token")
                     }
                 })
+                console.log(responseFile)
+                navigate("/")
+            } else {
+                console.log("gaada file")
             }
+
+
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    const deleteHandler = async () => {
+        try {
+            let response = await axios ({
+                url: "http://localhost:3000/profile/" + profile.id,
+                method: "delete",
+                headers: {
+                    Authorization: localStorage.getItem("access_token")
+                }
+            })
+
+            localStorage.clear();
+            navigate('/login')
         } catch (error) {
             console.log(error)
         }
@@ -97,7 +125,7 @@ export default function Profile() {
         fetchProfile()
     }, [])
 
-    console.log(form);
+    console.log(profile);
 
   return (
     <>
@@ -125,14 +153,17 @@ export default function Profile() {
               <div className="ml-2 font-bold text-2xl">QuickChat</div>
             </div>
             <div className="flex flex-col items-center bg-indigo-100 border border-gray-200 mt-4 w-full py-6 px-4 rounded-lg">
-              <div className="flex w-full place-content-end">
+              <div className="flex w-full justify-between">
+                <button onClick={deleteHandler}>
+                <AiOutlineUserDelete className="size-6" />
+                </button>
                 <button>
                   <IoSettings className="size-6" />
                 </button>
               </div>
               <div className="h-20 w-20 rounded-full border overflow-hidden">
                 <img
-                  src="https://pbs.twimg.com/profile_images/1228666363939606529/cFZCx2CB_400x400.jpg"
+                  src={editProfile && editProfile.imgUrl}
                   alt="Avatar"
                   className="h-full w-full"
                 />
@@ -140,7 +171,7 @@ export default function Profile() {
               <div className="text-sm font-semibold mt-2">
                 {profile && profile.fullName}
               </div>
-              <div className="text-xs text-gray-500">Lead UI/UX Designer</div>
+              {/* <div className="text-xs text-gray-500">Lead UI/UX Designer</div> */}
               <div className="flex flex-row items-center mt-3">
                 <button
                   className="middle none center rounded-lg bg-red-500 py-3 px-6 font-sans text-xs font-bold uppercase text-white shadow-md shadow-red-500/20 transition-all hover:shadow-lg hover:shadow-red-500/40 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
@@ -191,7 +222,9 @@ export default function Profile() {
                     name="username"
                     placeholder={editProfile && editProfile.username}
                     className="input input-bordered w-full "
-                    disabled={editProfile && editProfile.username ? true : false}
+                    disabled={
+                      editProfile && editProfile.username ? true : false
+                    }
                     onChange={onChangeHandler}
                     value={form.username}
                   />
@@ -201,7 +234,7 @@ export default function Profile() {
                     <span className="label-text">Gender</span>
                   </div>
                   <input
-                  name="gender"
+                    name="gender"
                     type="text"
                     placeholder={editProfile && editProfile.gender}
                     className="input input-bordered w-full "
@@ -215,7 +248,7 @@ export default function Profile() {
                     <span className="label-text">Age</span>
                   </div>
                   <input
-                  name="age"
+                    name="age"
                     type="number"
                     placeholder={editProfile && editProfile.age}
                     className="input input-bordered w-full "
@@ -229,16 +262,22 @@ export default function Profile() {
                     <span className="label-text">Pick a file</span>
                   </div>
                   <input
-                  name="imgUrl"
+                    name="imgUrl"
                     type="file"
                     className="file-input file-input-bordered w-full "
                     onChange={onChangeFile}
                   />
                 </label>
-                <div >
-                    <br />
-                <button className="btn btn-accent mr-3">Update Profile</button>
-                  <Link to="/" className="btn btn-warning">Cancel</Link>
+                <br />
+                <div className="flex justify-between">
+                  <div>
+                    <button className="btn btn-accent mr-3">
+                      Update Profile
+                    </button>
+                    <Link to="/" className="btn btn-warning">
+                      Cancel
+                    </Link>
+                  </div>
                 </div>
               </form>
             </div>
