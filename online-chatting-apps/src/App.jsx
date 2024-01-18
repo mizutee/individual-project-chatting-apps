@@ -5,6 +5,7 @@ import LoginPage from "./pages/login"
 
 import { createBrowserRouter, redirect, RouterProvider } from "react-router-dom";
 import RegisterPage from "./pages/register";
+import Profile from "./pages/profile";
 
 const router = createBrowserRouter([
 
@@ -40,6 +41,11 @@ const router = createBrowserRouter([
       }
       return null;
     }
+  },
+
+  {
+    path: "/profile",
+    element: <Profile />
   }
 
 

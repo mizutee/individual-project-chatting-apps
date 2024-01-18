@@ -1,12 +1,33 @@
-import { Link } from "react-router-dom";
+import axios from "axios";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function RegisterPage() {
 
+    const navigate = useNavigate();
 
     const registerHandler = async (event) => {
         try {
             event.preventDefault();
-            console.log(event)
+            // console.log(event)
+            let name = event.target[0].value;
+            let email = event.target[1].value;
+            let password = event.target[2].value;
+
+            let registerData = {
+                email: email,
+                password: password,
+                fullName: name
+            }
+
+            let {data} = await axios({
+                url: "http://localhost:3000/register",
+                method: "post",
+                data: registerData
+            })
+
+            console.log(data)
+
+            navigate('/login')
         } catch (error) {
             console.log(error)
         }
@@ -73,9 +94,9 @@ export default function RegisterPage() {
                     <i className="fas fa-user text-blue-500" />
                   </div>
                   <input
-                    id="email"
-                    type="email"
-                    name="email"
+                    id="name"
+                    type="name"
+                    name="name"
                     className="
               text-sm
               placeholder-gray-500

@@ -108,7 +108,7 @@ app.post("/login", async (req, res) => {
       "rahasia"
     );
 
-    res.status(201).json({ access_token: token });
+    res.status(201).json({ access_token: token, profile: {id: user.id, email: user.email, fullName: user.fullName} });
   } catch (error) {
     console.log(error);
   }
@@ -116,10 +116,11 @@ app.post("/login", async (req, res) => {
 
 app.get("/profile", authentication, async (req, res) => {
   try {
-    let user = User.findOne({
+    let user = await User.findOne({
       where: {
         id: req.user.id,
       },
+      attributes: {exclude: "password"}
     });
     res.status(201).json(user);
   } catch (error) {
