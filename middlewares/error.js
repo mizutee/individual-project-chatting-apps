@@ -22,7 +22,7 @@ const errHandler = (err, req, res, next) => {
         message: "Error login user not found atau password not matched",
       });
       break;
-    case "file not exist":
+    case "NoFile":
       res.status(400).json({
         message: "Missing File",
       });

@@ -1,4 +1,4 @@
-# Lodging API Documentation
+# Online Chat App API Documentation
 
 ## Endpoints :
 
@@ -190,6 +190,14 @@ _Response (200 - OK)_
 }
 ```
 
+_Response (404 - NotFound)_
+
+```json
+{
+    "message": "Data Not Found"
+}
+```
+
 &nbsp;
 
 ## 5. PUT /profile/:id
@@ -286,6 +294,7 @@ _Response (201 - Created)_
 }
 ```
 
+
 &nbsp;
 
 ## 7. DELETE /profile/:id
@@ -317,6 +326,14 @@ _Response (200 - OK)_
 ```json
 {
     "message": "User has been deleted"
+}
+```
+
+_Response (404 - NotFound)_
+
+```json
+{
+    "message": "Data Not Found"
 }
 ```
 

@@ -157,6 +157,10 @@ app.get("/profile", authentication, async (req, res, next) => {
       },
       attributes: { exclude: "password" },
     });
+
+    if(!user) throw {name: "NotFound"}
+
+
     res.status(200).json(user);
   } catch (error) {
     next(error);
@@ -169,7 +173,7 @@ app.put("/profile/:id", authentication, async (req, res, next) => {
 
     let verifyData = await Profile.findByPk(id);
 
-    console.log(verifyData);
+    if(!verifyData) throw {name: "NotFound"}
 
     await Profile.update(req.body, {
       where: {
@@ -191,6 +195,8 @@ app.patch(
     try {
       const { id } = req.params;
       const buffer = req.file.buffer;
+      if(!req.file) throw {name: "NoFile"}
+      if(!buffer) throw {name: "NoFile"}
       const decodedBuffer = Buffer.from(buffer).toString("base64");
       const changeImg = `data:${req.file.mimetype};base64,${decodedBuffer}`; // convert buffer => data URI
       const upload = await cloudinary.uploader.upload(changeImg, {
@@ -218,11 +224,13 @@ app.patch(
 app.delete("/profile/:id", authentication, async (req, res, next) => {
   try {
 
-    await User.destroy({
+    let data = await User.destroy({
       where: {
         id: req.params.id
       }
     })
+
+    if (!data) throw {name: "NotFound"}
 
     res.status(200).json({message: "User has been deleted"})
   } catch (error) {
@@ -232,6 +240,8 @@ app.delete("/profile/:id", authentication, async (req, res, next) => {
 
 app.use(errHandler);
 
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`);
-});
+// app.listen(port, () => {
+//   console.log(`Example app listening on port ${port}`);
+// });
+
+module.exports = app
