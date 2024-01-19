@@ -3,7 +3,7 @@ if (process.env.NODE_ENV !== "production") {
 }
 const express = require("express");
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 const { User, Profile } = require("./models");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
